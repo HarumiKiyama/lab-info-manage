@@ -5,9 +5,6 @@ description = "a simple lims"
 authors = ["harumi <lucius0720@hotmail.com>"]
 package-mode = false
 
-[tool.virtualenvs]
-in-project = true
-
 [tool.poetry.dependencies]
 python = "^3.10"
 uvicorn = { extras = ["standard"], version = "^0.24.0.post1" }
@@ -77,7 +74,3 @@ ignore = [
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
-
-[tool.pyright]
-venvPath = "/home/harumi/.cache/pypoetry/virtualenvs"
-venv = "lims-rSWxkWwa-py3.11"
