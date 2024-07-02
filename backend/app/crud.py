@@ -30,14 +30,14 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
     return db_user
 
 
-def get_user_by_email(*, session: Session, email: str) -> User | None:
-    statement = select(User).where(User.email == email)
+def get_user_by_phonenum(*, session: Session, phonenum: str) -> User | None:
+    statement = select(User).where(User.phonenum == phonenum)
     session_user = session.exec(statement).first()
     return session_user
 
 
-def authenticate(*, session: Session, email: str, password: str) -> User | None:
-    db_user = get_user_by_email(session=session, email=email)
+def authenticate(*, session: Session, phonenum: str, password: str) -> User | None:
+    db_user = get_user_by_phonenum(session=session, phonenum=phonenum)
     if not db_user:
         return None
     if not verify_password(password, db_user.hashed_password):
@@ -45,9 +45,3 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
     return db_user
 
 
-def create_item(*, session: Session, item_in: ItemCreate, owner_id: int) -> Item:
-    db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
-    session.add(db_item)
-    session.commit()
-    session.refresh(db_item)
-    return db_item
