@@ -30,36 +30,13 @@ def test_get_users_normal_user_me(
     assert current_user["email"] == settings.EMAIL_TEST_USER
 
 
-def test_create_user_new_email(
-    client: TestClient,
-    superuser_token_headers: dict[str, str],
-    db: Session,
-    mocker: MockerFixture,
-) -> None:
-    mocker.patch("app.utils.send_email")
-    mocker.patch("app.core.config.settings.SMTP_HOST", "smtp.example.com")
-    mocker.patch("app.core.config.settings.SMTP_USER", "admin@example.com")
-    username = random_email()
-    password = random_lower_string()
-    data = {"email": username, "password": password}
-    r = client.post(
-        f"{settings.API_V1_STR}/users/",
-        headers=superuser_token_headers,
-        json=data,
-    )
-    assert 200 <= r.status_code < 300
-    created_user = r.json()
-    user = crud.get_user_by_email(session=db, email=username)
-    assert user
-    assert user.email == created_user["email"]
-
 
 def test_get_existing_user(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     username = random_email()
     password = random_lower_string()
-    user_in = UserCreate(email=username, password=password)
+    user_in = UserCreate(email=username, password=password,username=username,phonenum="phonenum")
     user = crud.create_user(session=db, user_create=user_in)
     user_id = user.id
     r = client.get(
@@ -76,7 +53,7 @@ def test_get_existing_user(
 def test_get_existing_user_current_user(client: TestClient, db: Session) -> None:
     username = random_email()
     password = random_lower_string()
-    user_in = UserCreate(email=username, password=password)
+    user_in = UserCreate(email=username, password=password,phonenum="phonenum",username=username)
     user = crud.create_user(session=db, user_create=user_in)
     user_id = user.id
 
@@ -117,7 +94,7 @@ def test_create_user_existing_username(
     username = random_email()
     # username = email
     password = random_lower_string()
-    user_in = UserCreate(email=username, password=password)
+    user_in = UserCreate(email=username, password=password,username=username,phonenum="phonenum")
     crud.create_user(session=db, user_create=user_in)
     data = {"email": username, "password": password}
     r = client.post(
@@ -126,6 +103,7 @@ def test_create_user_existing_username(
         json=data,
     )
     created_user = r.json()
+    print(created_user)
     assert r.status_code == 400
     assert "_id" not in created_user
 

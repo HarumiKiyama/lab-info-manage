@@ -11,6 +11,8 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app.models import (
+    Message,
+    UpdatePassword,
     User,
     UserCreate,
     UserCreateOpen,
@@ -20,6 +22,7 @@ from app.models import (
     UserUpdateMe,
     Message,
 )
+
 
 router = APIRouter()
 
@@ -56,6 +59,7 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
         )
 
     user = crud.create_user(session=session, user_create=user_in)
+
     return user
 
 

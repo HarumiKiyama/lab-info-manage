@@ -1,18 +1,18 @@
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel,Column,String
+
 
 
 # Shared properties
 class UserBase(SQLModel):
-    phonenum: str = Field(unique=True, index=True)
-    username: str
     is_active: bool = True
     is_superuser: bool = False
+    email :str  = Field(index=True)
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str
-
+    email :str  
 
 class UserCreateOpen(SQLModel):
     phonenum: str
@@ -38,8 +38,11 @@ class UpdatePassword(SQLModel):
 
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
-    id: int = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
+    username:str 
+
+    
 
 # Properties to return via API, id is always required
 class UserOut(UserBase):
@@ -67,4 +70,4 @@ class NewPassword(SQLModel):
     new_password: str
 
 class Message(SQLModel):
-    message: str
+    pass
