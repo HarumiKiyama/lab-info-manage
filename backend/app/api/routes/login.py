@@ -24,7 +24,7 @@ def login_access_token(
     OAuth2 compatible token login, get an access token for future requests
     """
     user = crud.authenticate(
-        session=session,  password=form_data.password
+        session=session,  password=form_data.password, username=form_data.username
     )
 
     if not user:

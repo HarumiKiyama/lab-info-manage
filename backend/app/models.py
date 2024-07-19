@@ -13,6 +13,7 @@ class UserBase(SQLModel):
 class UserCreate(UserBase):
     password: str
     email :str  
+    username: str
 
 class UserCreateOpen(SQLModel):
     phonenum: str
