@@ -10,7 +10,7 @@ def test_get_access_token(client: TestClient) -> None:
     }
     r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
     tokens = r.json()
-    print(tokens)
+    
     assert r.status_code == 200
     assert "access_token" in tokens
     assert tokens["access_token"]
@@ -33,6 +33,6 @@ def test_use_access_token(
         headers=superuser_token_headers,
     )
     result = r.json()
-    print(result)
+    
     assert r.status_code == 200
     assert "email" in result

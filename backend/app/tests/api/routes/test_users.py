@@ -94,7 +94,9 @@ def test_create_user_existing_username(
     username = random_email()
     # username = email
     password = random_lower_string()
-    user_in = UserCreate(email=username, password=password,username=username,phonenum="phonenum")
+
+    user_in = UserCreate(email=username, password=password,username=username)
+    
     crud.create_user(session=db, user_create=user_in)
     data = {"email": username, "password": password}
     r = client.post(

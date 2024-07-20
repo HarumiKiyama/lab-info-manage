@@ -51,7 +51,8 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
     Create new user.
     """
-    user = crud.get_user_by_phonenum(session=session, phonenum=user_in.phonenum)
+    user = crud.get_user_by_email(session=session, email=user_in.email)
+    
     if user:
         raise HTTPException(
             status_code=400,
@@ -59,7 +60,7 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
         )
 
     user = crud.create_user(session=session, user_create=user_in)
-
+    
     return user
 
 
@@ -81,6 +82,7 @@ def update_user_me(
             )
     user_data = user_in.model_dump(exclude_unset=True)
     current_user.sqlmodel_update(user_data)
+    
     session.add(current_user)
     session.commit()
     session.refresh(current_user)

@@ -42,6 +42,7 @@ def normal_user_token_headers(client: TestClient, db: Session) -> dict[str, str]
          username=settings.EMAIL_TEST_USER,
     )
     create_user(session=db,user_create=user_in)
+    print(user_in)
     return authentication_token_from_email(
         client=client, email=settings.EMAIL_TEST_USER, db=db,
     )
