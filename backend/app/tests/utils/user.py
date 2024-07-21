@@ -11,7 +11,6 @@ def user_authentication_headers(
     *, client: TestClient, email: str, password: str
 ) -> dict[str, str]:
     data = {"username": email, "password": password}
-    print(data)
     r = client.post(f"{settings.API_V1_STR}/login/access-token", data=data)
     response = r.json()
     
@@ -48,4 +47,4 @@ def authentication_token_from_email(
             raise Exception("User id not set")
         user = crud.update_user(session=db, db_user=user, user_in=user_in_update)
 
-    return user_authentication_headers(client=client, email=email, password="admin")
+    return user_authentication_headers(client=client, email=email, password=password)
