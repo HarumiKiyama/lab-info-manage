@@ -1,12 +1,18 @@
 from typing import Any
 
 from sqlmodel import Session, select
-
+from fastapi import HTTPException
 from app.core.security import get_password_hash, verify_password
 from app.models import  User, UserCreate, UserUpdate
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
+    existing_user = session.query(User).filter_by(email=user_create.email).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="The user with this email already exists in the system.",
+        )
     db_obj = User.model_validate(
         user_create, update={"hashed_password": get_password_hash(user_create.password)}
     )
@@ -38,7 +44,8 @@ def get_user_by_phonenum(*, session: Session, phonenum: str) -> User | None:
 
 def authenticate(*, session: Session, username: str, password: str) -> User | None:
     db_user = get_user_by_username(session=session, username=username)
-    if not db_user:
+    
+    if not db_user:      
         return None
     if not verify_password(password, db_user.hashed_password):
         return None

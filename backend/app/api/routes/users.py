@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, select
+from sqlmodel import col, delete, func, select, text
 
 from app import crud
 from app.api.deps import (
@@ -51,7 +51,8 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
     Create new user.
     """
-    user = crud.get_user_by_phonenum(session=session, phonenum=user_in.phonenum)
+    user = crud.get_user_by_email(session=session, email=user_in.email)
+    
     if user:
         raise HTTPException(
             status_code=400,
@@ -59,7 +60,7 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
         )
 
     user = crud.create_user(session=session, user_create=user_in)
-
+    
     return user
 
 
@@ -70,10 +71,10 @@ def update_user_me(
     """
     Update own user.
     """
-
-    if user_in.phonenum:
-        existing_user = crud.get_user_by_phonenum(
-            session=session, phonenum=user_in.phonenum
+   
+    if user_in.email:
+        existing_user = crud.get_user_by_email(
+            session=session, email=user_in.email
         )
         if existing_user and existing_user.id != current_user.id:
             raise HTTPException(
@@ -155,15 +156,16 @@ def update_user(
             status_code=404,
             detail="The user with this id does not exist in the system",
         )
-    if user_in.phonenum:
-        existing_user = crud.get_user_by_phonenum(
-            session=session, phonenum=user_in.phonenum
+    if user_in.email:
+        existing_user = crud.get_user_by_email(
+            session=session, email=user_in.email
         )
         if existing_user and existing_user.id != user_id:
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
-
+    print(db_user, "db user ")
+    print(user_in, "user in")
     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
     return db_user
 
@@ -187,8 +189,8 @@ def delete_user(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
 
-    statement = delete(Item).where(col(Item.owner_id) == user_id)
-    session.exec(statement)  # type: ignore
+    
+    
     session.delete(user)
     session.commit()
     return Message(message="User deleted successfully")

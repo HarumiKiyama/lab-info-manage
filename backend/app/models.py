@@ -13,7 +13,8 @@ class UserBase(SQLModel):
 class UserCreate(UserBase):
     password: str
     email :str  
-
+    username: str
+    full_name:str | None = None
 class UserCreateOpen(SQLModel):
     phonenum: str
     username: str
@@ -24,12 +25,13 @@ class UserCreateOpen(SQLModel):
 class UserUpdate(UserBase):
     phonenum: str | None = None  # type: ignore
     password: str | None = None
-
+    full_name:str | None = None
 
 class UserUpdateMe(SQLModel):
     full_name: str | None = None
     phonenum: str | None = None
-
+    email: str |None = None
+    
 
 class UpdatePassword(SQLModel):
     current_password: str
@@ -41,13 +43,15 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     username:str 
-
+    full_name: str | None = Field(default=None, nullable=True)
+    
     
 
 # Properties to return via API, id is always required
 class UserOut(UserBase):
     id: int
-
+    full_name:str  | None = None
+    
 
 class UsersOut(SQLModel):
     data: list[UserOut]
