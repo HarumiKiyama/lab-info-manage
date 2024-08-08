@@ -1,9 +1,11 @@
-from typing import Any
-
-from sqlmodel import Session, select
+from datetime import datetime, timezone
+from typing import Any, Optional, Type
+from models import UpdateUserInfoLog
+from sqlmodel import Session, select,SQLModel
 from fastapi import HTTPException
 from app.core.security import get_password_hash, verify_password
 from app.models import  User, UserCreate, UserUpdate
+from typing import Dict
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -61,3 +63,31 @@ def get_user_by_email(*,session:Session,email:str)->User | None:
     session_user=session.exec(statement).first()
     return session_user
 
+
+def add_information(session: Session, model: SQLModel) -> SQLModel:
+     session.add(model)
+     session.commit()
+     session.refresh(model)
+     return model
+
+def update_information(session: Session, model: SQLModel, update_data: Dict) -> SQLModel:
+    model_data = get_information_by_id(session, model, model.id)
+    if model_data:
+        for key, value in update_data.items():
+            setattr(model_data, key, value)
+        session.commit()
+        # 记录修改信息
+        log = UpdateUserInfoLog(
+            table_name=model.__name__,
+            record_id=model_data.id,
+            change_type='UPDATE',
+            change_details=update_data,
+            changed_at=datetime.now(timezone.utc)
+        )
+        session.add(log)
+        session.commit()
+    return model_data
+
+# 读取记录
+def get_information_by_id(session: Session, model: Type[SQLModel], record_id: int) -> Optional[SQLModel]:
+    return session.get(model, record_id)
