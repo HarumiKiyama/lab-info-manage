@@ -202,3 +202,4 @@ packages/react-devtools-timeline/dist
 
 # Personal Setting
 .vscode/
+.aider*
